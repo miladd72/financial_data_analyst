@@ -63,6 +63,8 @@ class GetBinanceData:
         df = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 'close_time',
                                          'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume',
                                          'taker_buy_quote_asset_volume', 'ignore'])
+        cols = ['open', 'high', 'low', 'close', 'volume']
+        df[cols] = df[cols].astype(float)
         df.insert(0, 'date_time', pd.to_datetime(df['timestamp'], unit='ms'))
         return df.reset_index(drop=True)
 
