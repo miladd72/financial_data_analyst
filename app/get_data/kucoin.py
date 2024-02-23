@@ -59,7 +59,10 @@ class GetKuCoinData:
 
     def __process_data(self, data):
         df = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume', 'value'])
-        df.insert(0, 'date_time', pd.to_datetime(df['timestamp'].astype(int), unit='s'))
+        cols = ['open', 'high', 'low', 'close', 'volume', 'value']
+        df[cols] = df[cols].astype(float)
+        df['timestamp'] = df['timestamp'].astype(int)
+        df.insert(0, 'date_time', pd.to_datetime(df['timestamp'], unit='s'))
         return df
 
     @retry(retry_count=RETRY_COUNTS)
