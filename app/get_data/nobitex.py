@@ -32,7 +32,8 @@ class GetNobitexData:
         i = 0
         while True:
             i += 1
-            print(f"get epoch: {i}")
+            if i%10 == 0:
+                print(f"get epoch: {i}")
             params = {
                 'symbol': symbol,
                 'resolution': interval,
@@ -78,7 +79,7 @@ class GetNobitexData:
 
 if __name__ == "__main__":
     nobitex_obj = GetNobitexData()
-    symbol = 'USDTIRT'
+    symbol = 'BTCIRT'
     interval = 1
     start_time = "2022-12-01"
     end_time = "2023-12-01"
