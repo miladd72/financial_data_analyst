@@ -85,3 +85,45 @@ from app.configs import ROOT_DIR
 df1 = pd.read_pickle(os.path.join(ROOT_DIR, "data\BTC-USDT_1min_2022-12-01_to_2023-12-01_kucoin.pkl"))
 df2 = pd.read_pickle(os.path.join(ROOT_DIR, "data\BTCUSDT_1m_2022-12-01_to_2023-12-01_binance.pkl"))
 
+#%%
+import numpy as np
+import plotly.graph_objects as go
+import scipy.stats as stats
+
+# Define parameters
+mean = 6.312159199465759e-07
+variance = 3.7062057427773346e-07
+skewness = -0.5735230695186057
+kurtosis = 910.0157718078657
+
+
+# Mean = 0.0005030122238542142
+# Variance = 1.1761032059723276e-07
+# Skewness = 11.597519331962822
+# Kurtosis = 485.93204975971645
+
+
+# Generate random data based on the moments
+data = stats.skewnorm.rvs(a=skewness, loc=mean, scale=np.sqrt(variance), size=10000)
+
+# Create histogram
+hist_data, bin_edges = np.histogram(data, bins=100, density=True)
+bin_centers = 0.5*(bin_edges[1:] + bin_edges[:-1])
+
+# Create figure
+fig = go.Figure()
+
+# Add histogram trace
+fig.add_trace(go.Bar(x=bin_centers, y=hist_data,
+                     marker_color='rgba(0, 0, 255, 0.5)',
+                     name='Histogram'))
+
+# Update layout
+fig.update_layout(title='Distribution Plot',
+                  xaxis_title='Value',
+                  yaxis_title='Density')
+
+# Show figure
+fig.show()
+#%%
+
