@@ -1,2 +1,3 @@
 from .fundamental_aspect_timeseries import AutocorrelationStationaryAnalysis
 from .quantitative_analysis import QuantitativeAnalysis
+from .inter_market_analysis import InterMarketAnalysis

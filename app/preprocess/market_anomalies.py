@@ -19,29 +19,36 @@ class MarketAnomalies:
         Returns:
             DataFrame: DataFrame with missing values filled according to the specified method.
         """
+        all_missing_indices = {}
         if method == 'carry_forward':
             filled_df = df.fillna(method='ffill')
         elif method == 'simple_average':
             filled_df = df.apply(lambda col: col.fillna(col.interpolate()), axis=0)
         elif method == 'adjacent_mean':
             # Fill missing values with the mean of adjacent values (n before and n after)
-            filled_df = self.fill_adjacent_mean(df, n=4)
+            filled_df, all_missing_indices = self.fill_adjacent_mean(df, n=4)
         else:
             raise ValueError(
                 "Invalid method. Supported methods are 'carry_forward', 'simple_average', and 'adjacent_mean'.")
 
-        return filled_df
+        return filled_df, all_missing_indices
 
     def fill_adjacent_mean(self, df, n=4):
         filled_df = df.copy()
+        all_missing_indices = {}
         for col in filled_df.columns:
             missing_indices = filled_df[col][filled_df[col].isnull()].index
-            for idx in missing_indices:
-                start_idx = max(0, idx - n)
-                end_idx = min(len(filled_df) - 1, idx + n)
-                adjacent_values = filled_df[col].iloc[start_idx:end_idx + 1]
-                filled_df.at[idx, col] = adjacent_values.mean()
-        return filled_df
+            if len(missing_indices):
+                all_missing_indices[col] = len(missing_indices)
+                print(f"{col}: missing_indices = {missing_indices}")
+                for idx in missing_indices:
+                    start_idx = max(0, idx - n)
+                    end_idx = min(len(filled_df) - 1, idx + n)
+                    adjacent_values = filled_df[col].iloc[start_idx:end_idx + 1]
+                    filled_df.at[idx, col] = adjacent_values.mean()
+            else:
+                print(f"No missing value in {col}")
+        return filled_df, all_missing_indices
 
     def _detect_zscore_outliers(self, df, threshold=3):
         """
@@ -115,11 +122,11 @@ class MarketAnomalies:
             elif method == 'boxplot':
                 outliers = self._detect_iqr_outliers(corrected_df[col], threshold)
             elif method == "time_series":
-                outliers = self._detect_outliers_time_series(corrected_df[col], window_size=5, threshold=2)
+                outliers = self._detect_outliers_time_series(corrected_df[col], window_size=5, threshold=threshold)
             else:
                 raise ValueError("Invalid method. Supported methods are 'z-score' and 'boxplot'.")
 
-            print(sum(outliers))
+            print(f" {col}: sum of outliers = {sum(outliers)}")
             corrected_df[col] = corrected_df[col].mask(outliers, np.nan)
             if interp_method != 'exclude':
                 corrected_df[col] = corrected_df[col].mask(outliers, corrected_df[col].interpolate(method=interp_method))
@@ -133,5 +140,6 @@ if __name__ == "__main__":
     import os
     obj = MarketAnomalies()
     df = pd.read_pickle(os.path.join(ROOT_DIR, "data/usd.pkl"))
-    dfr = obj.detect_and_correct_outliers(df, method='time_series', threshold=3, interp_method='linear')
+    dff, mis = obj.fill_missing_data(df, method="adjacent_mean")
+    # dfr = obj.detect_and_correct_outliers(df, method='time_series', threshold=3, interp_method='linear')
     print("")

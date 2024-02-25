@@ -68,7 +68,7 @@ class QuantitativeAnalysis:
 
         return labels
 
-    def plot_volatility_clustering(self, price, num_clusters=5, lambda_value=0.94):
+    def plot_volatility_clustering(self, price, tilte, num_clusters=5, lambda_value=0.94):
         """
         Visualize volatility clustering to discern distinct market regimes.
 
@@ -85,7 +85,7 @@ class QuantitativeAnalysis:
             fig.add_trace(go.Scatter(x=cluster_indices, y=volatility[cluster_indices],
                                      mode='lines', name=f'Cluster {cluster_label}'))
 
-        fig.update_layout(title='Volatility Clustering Analysis',
+        fig.update_layout(title='Volatility Clustering Analysis' + tilte,
                           xaxis_title='Time',
                           yaxis_title='Volatility',
                           template='plotly_dark')
@@ -144,6 +144,7 @@ class QuantitativeAnalysis:
         print("Variance:", log_returns_variance)
         print("Skewness:", log_returns_skewness)
         print("Kurtosis:", log_returns_kurtosis)
+        # print(f"Mean: {log_returns_mean},  Variance: {log_returns_variance},  Skewness: {log_returns_skewness},  Kurtosis: {log_returns_kurtosis}")
 
         volatility_mean, volatility_variance, volatility_skewness, volatility_kurtosis = self.volatility_statistics(volatility)
         print("\nVolatility Statistics:")
@@ -151,10 +152,11 @@ class QuantitativeAnalysis:
         print("Variance:", volatility_variance)
         print("Skewness:", volatility_skewness)
         print("Kurtosis:", volatility_kurtosis)
+        # print(f"Mean: {volatility_mean},  Variance: {volatility_variance},  Skewness: {volatility_skewness},  Kurtosis: {volatility_kurtosis}")
 
 
 
-    def plot_qq_plot(self, log_returns):
+    def plot_qq_plot(self, log_returns, title=""):
         """
         Generate Quantile-Quantile plot to visually inspect the distribution of log returns
         against a normal distribution using Plotly.
@@ -191,7 +193,7 @@ class QuantitativeAnalysis:
 
         # Create layout
         layout = go.Layout(
-            title='Q-Q Plot of Log Returns Against Normal Distribution',
+            title='Q-Q Plot of Log Returns Against Normal Distribution' + title,
             xaxis=dict(title='Theoretical Quantiles'),
             yaxis=dict(title='Sample Quantiles'),
             showlegend=True,
